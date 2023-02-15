@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Hello, WebAssembly!</title>
+  <script>
+    
+    const wasm = './target/wasm32-unknown-unknown/release/wasm_dev_book_hello_wasm.wasm'
+    const wasmStartTime = performance.now()
+    fetch(wasm)
+      .then(response => response.arrayBuffer())
+      .then(bytes => WebAssembly.instantiate(bytes, {})
+      ).then(results => {
+        console.log('wasm',results.instance.exports.spigot_pi())
+        const wasmEndTime = performance.now()
+        console.log('wasm',wasmEndTime - wasmStartTime)
+      })
+
+
+
+    const spigotPi = () => {
+      const base = 10000;
+      let n = 8400;
+      let i;
+      let out=0;
+      let denom;
+      const numerator = new Array(8400).fill(base/5);
+      let res = ""
+  
+      while (n > 0) {
+        let temp=0;
+        i=n-1;
+        while (i>0) {
+          denom=2*i-1;
+          temp = temp*i+numerator[i]*base;
+          numerator[i]=temp%denom;
+          temp = temp/denom;
+          i-=1;
+        }
+        res += String(Math.trunc(out+temp/base)).padStart(4, '0');
+        out = temp % base;
+        n -= 14;
+      };
+      return res
+    }
+    const jsStartTime = performance.now()
+    console.log('js',spigotPi())
+    const jsEndTime = performance.now()
+    console.log('js',jsEndTime - jsStartTime)
+
+
+
+
+      </script>
+</head>
+
+</html>
